@@ -8,5 +8,5 @@ We delved into employment opportunities, safety statistics, work-life balance fa
 
 This project serves as a valuable resource for those making informed decisions about post-university life. It provides a transparent and reproducible reference for understanding the analysis process. Feel free to reach out for additional information or collaboration opportunities.
 
-Happy exploring, and best of luck with your your job search in the city of your dreams!
+Happy exploring, and best of luck with your job search in the city of your dreams!
 
