@@ -1,0 +1,92 @@
+---
+title: "visualisation"
+output: html_document
+date: "2023-11-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse) # the usual stuff: dplyr, readr, and other goodies
+library(lubridate) # to handle dates
+
+```
+
+```{r}
+Temperature <- read_csv("desktop/weather visualisation.csv")
+```
+
+```{r}
+glimpse(Temperature)
+```
+
+
+```{r}
+library(ggplot2)
+
+# Reorder City factor levels based on Q2 values
+Temperature$City <- reorder(Temperature$City, Temperature$Q2, FUN = function(x) -median(x))
+
+# Enhanced boxplot
+ggplot(Temperature, aes(x = City, ymin = Low_Temp, lower = Q1, middle = Q2, upper = Q3, ymax = Highest_Temp)) +
+  geom_boxplot(stat = "identity", width = 0.5, fill = "skyblue2", color = "black") +
+  labs(
+    title = "Temperature Range Statistics for Cities in 2022",
+    subtitle = "Displaying Cities Arranged in Descending Order of Median Temperature",
+    x = "City",
+    y = "Temperature (°C)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10, color = "black"),
+    axis.text.y = element_text(size = 10, color = "black"),
+    axis.title = element_text(size = 12),
+    plot.title = element_text(hjust = 0, size = 12),
+    plot.subtitle = element_text(hjust = 0, size = 10),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  )
+```
+
+```{r}
+Shinetime <- read_csv("desktop/graph2.csv")
+```
+```{r}
+glimpse(Shinetime)
+```
+```{r}
+# Reshaping the data to long format
+long_data <- pivot_longer(Shinetime, cols = Jan:Dec, names_to = "Month", values_to = "SunshineHours")
+
+long_data$Month <- factor(long_data$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+
+# Create a faceted bar graph
+ggplot(long_data, aes(x = Month, y = SunshineHours, fill = SunshineHours)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") + 
+  facet_wrap(~ City) +
+  labs(
+    title = "Monthly Sunshine Hours in Various Cities", 
+    x = "Month", 
+    y = "Sunshine Hours",
+    fill = "Sunshine hours"  
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 5.5, color = "black"),
+    axis.text.y = element_text(size = 8, color = "black"),
+    axis.title = element_text(size = 10, face = "bold"),
+    plot.title = element_text(hjust = 0, size = 12),
+    legend.title = element_text(size = 8),
+    legend.position = "right",
+    panel.background = element_rect(fill = "white"),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  )
+```
+

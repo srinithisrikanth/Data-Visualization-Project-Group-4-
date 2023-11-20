@@ -1,0 +1,155 @@
+---
+title: "Crime"
+author: "Srinithi Srikanth"
+date: "2023-11-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Load required libraries
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggmap)
+library(plotly)
+library(opencage)
+library(mapboxapi)
+library(httr)
+library(forcats)
+
+```
+
+```{r}
+#load required datasets
+# Set the file path
+file_path <- "C:\\Users\\Shreya\\Downloads\\crime_rates.csv"
+
+# Load the CSV file
+crime_data <- read.csv(file_path)
+
+file_path_1<-"C:\\Users\\Shreya\\Downloads\\crime_countires.csv"
+
+crime_by_offence<-read.csv(file_path_1)
+```
+
+```{r}
+#cleaning the data
+crime_data$crime_rate <- as.numeric(gsub(",", "", crime_data$crime_rate))
+
+crime_data$year <- as.factor(crime_data$year)
+
+crime_data$city<-as.factor(crime_data$city)
+
+# Find the column index of 'rate'
+rate_column_index <- which(colnames(crime_by_offence) == 'rate')
+
+# Select columns up to and including the 'rate' column
+columns_to_keep <- names(crime_by_offence)[1:rate_column_index]
+
+# Create a new data frame with only the selected columns
+crime_by_offence <- crime_by_offence[, columns_to_keep]
+
+# Checking the structure of the dataframe after changes
+str(crime_data)
+```
+
+```         
+Error in color_scale(.) : could not find function "color_scale"
+```
+
+```{r}
+
+# Calculate average crime rates for each city
+average_crime_rates <- crime_data %>%
+  group_by(city) %>%
+  summarize(avg_crime_rate = mean(crime_rate)) %>%
+  arrange(desc(avg_crime_rate))
+
+# Use the average crime rates to order the levels of the 'city' factor
+city_order <- average_crime_rates$city
+
+# Reorder the levels of the 'city' factor
+selected_cities <- bind_rows(head(average_crime_rates, 3), tail(average_crime_rates, 3)) %>%
+  mutate(city = factor(city, levels = city_order))
+
+# Merge with the original data to get the complete information for selected cities
+selected_data <- crime_data %>%
+  inner_join(selected_cities, by = "city")
+
+# Manually assign colors based on crime rates
+custom_colors <- colorRampPalette(c("#8B0000", "#FF4500", "#FF8C00", "#FFA500", "#FFD700"))(length(unique(selected_data$city)))
+
+# Reorder the levels of the 'city' factor in selected data based on crime rates
+selected_data$city <- factor(selected_data$city, levels = city_order)
+
+# Create an interactive line plot directly with plot_ly
+plot <- plot_ly(selected_data, x = ~year, y = ~crime_rate, color = ~city,
+                type = 'scatter', mode = 'lines+markers', facet_wrap = ~city,
+                colors = custom_colors, marker = list(line = list(width = 4))) %>%
+  layout(title = 'Crime every 100,000 persons from 2018-2022',
+         subtitle='Plot shows only top 3 and bottom 3 cities by crime rate',
+         xaxis = list(title = 'Year'),
+         yaxis = list(title = 'Crime Rate', type = 'log'),
+         showlegend = TRUE)
+
+# Show the plot
+plot
+```
+
+```{r}
+crime_data_2022 <- subset(crime_data, year == 2022)
+
+crime_data_2022 <- subset(crime_data, year == 2022)
+
+# Create plot
+plot_2 <- ggplot(crime_data_2022, aes(x = reorder(city, -crime_rate), y = crime_rate, fill = crime_rate)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  scale_fill_gradient(low ="#FFD700", high ="#8B0000", guide = "colorbar", name = "Crime Rate") +
+  coord_flip() +
+  labs(title = "Latest crime rates (2022)",
+       subtitle="Crime rates represent crimes every 100,000 persons",
+       x = "City",
+       y = "Crime Rate")+
+  theme_minimal()
+
+# Show the plot
+print(plot_2)
+```
+
+```{r}
+#Plot shows the three least safe cities as per the score board and the top 3 crimes in these cities
+
+# Convert the 'rate' column to numeric
+crime_by_offence$rate <- as.numeric(crime_by_offence$rate)
+
+# Calculate the mean rate for each city
+mean_rate_by_city <- aggregate(rate ~ city, data = crime_by_offence, mean)
+
+# Order cities by mean rate in descending order
+ordered_cities <- mean_rate_by_city[order(-mean_rate_by_city$rate), "city"]
+
+# Order the data frame by city and rate
+crime_by_offence <- crime_by_offence[order(crime_by_offence$city, -crime_by_offence$rate), ]
+
+# Get the top 3 crime types by rate for each city
+top3_crime_types <- crime_by_offence %>%
+  group_by(city) %>%
+  top_n(3, wt = rate)
+
+# Create a custom color palette from bright red to bright orange
+custom_palette <- colorRampPalette(c("darkred", "yellow"))(6)
+
+# Plot the bar chart
+ggplot(top3_crime_types, aes(x = reorder(city, -rate), y = rate, fill = reorder(crime_type, -rate))) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = custom_palette) +
+  labs(title = "Most common crimes in the least safe cities",
+       subtitle="Rate calculated as offences every 100,000 persons",
+       x = "City",
+       y = "Rate") +
+  theme_minimal()
+```

@@ -1,0 +1,59 @@
+﻿Programs,Year,Category,Breakdown,Mean,Currency,Max,Currency,Min,Currency,Mean,Currency,Max,Currency,Min,Currency,Mean,Currency,Max,Currency,Min,Currency
+MAM,2020,Industry,Overall,39346,GBP,85007,GBP,12947,GBP,50800,USD,110000,USD,16929,USD,69653,International Dollars,178388,International Dollars,34526,International Dollars
+MAM,2020,Industry,Other compensation,9740,GBP,70518,GBP,1369,GBP,12554,USD,90482,USD,1759,USD,17063,International Dollars,78338,International Dollars,1961,International Dollars
+MAM,2020,Industry,Consulting,41558,GBP,85007,GBP,13104,GBP,54234,USD,110000,USD,17550,USD,75334,International Dollars,178388,International Dollars,34526,International Dollars
+MAM,2020,Industry,Other compensation,7996,GBP,28593,GBP,1369,GBP,10392,USD,37000,USD,1759,USD,15605,International Dollars,60003,International Dollars,2877,International Dollars
+MAM,2020,Industry,Technology,35916,GBP,57773,GBP,12947,GBP,46109,USD,74612,USD,16929,USD,68427,International Dollars,122040,International Dollars,44398,International Dollars
+MAM,2020,Industry,Other compensation,8668,GBP,40000,GBP,2036,GBP,11115,USD,52123,USD,2673,USD,15295,International Dollars,60021,International Dollars,4309,International Dollars
+MAM,2020,Industry,Financial Services,40949,GBP,65441,GBP,27319,GBP,52785,USD,85155,USD,34728,USD,67009,International Dollars,108942,International Dollars,39990,International Dollars
+MAM,2020,Industry,Other compensation,9493,GBP,11383,GBP,5000,GBP,12067,USD,14727,USD,6407,USD,18962,International Dollars,24088,International Dollars,7378,International Dollars
+MAM,2020,Industry,Diversified Sectors,37950,GBP,51894,GBP,15467,GBP,47376,USD,63143,USD,20000,USD,52447,International Dollars,76511,International Dollars,38119,International Dollars
+MAM,2020,Industry,Other compensation,25272,GBP,70518,GBP,1432,GBP,32415,USD,90482,USD,1764,USD,30141,International Dollars,78338,International Dollars,1961,International Dollars
+MAM,2020,Location,Overall,39346,GBP,85007,GBP,12947,GBP,50800,USD,110000,USD,16929,USD,69653,International Dollars,178388,International Dollars,34526,International Dollars
+MAM,2020,Location,Other compensation,9740,GBP,70518,GBP,1369,GBP,12554,USD,90482,USD,1759,USD,17063,International Dollars,78338,International Dollars,1961,International Dollars
+MAM,2020,Location,Asia,28546,GBP,65441,GBP,12947,GBP,36505,USD,85155,USD,16929,USD,67161,International Dollars,122040,International Dollars,34526,International Dollars
+MAM,2020,Location,Other compensation,6133,GBP,11629,GBP,1369,GBP,7756,USD,14727,USD,1759,USD,14528,International Dollars,24088,International Dollars,2877,International Dollars
+MAM,2020,Location,Europe (excl. UK),46080,GBP,63103,GBP,32336,GBP,60096,USD,83001,USD,41350,USD,65329,International Dollars,97584,International Dollars,38119,International Dollars
+MAM,2020,Location,Other compensation,15035,GBP,70518,GBP,2704,GBP,19523,USD,90482,USD,3557,USD,18737,International Dollars,78338,International Dollars,4182,International Dollars
+MAM,2020,Location,Middle East,65859,GBP,85007,GBP,54073,GBP,85865,USD,110000,USD,69966,USD,139248,International Dollars,178388,International Dollars,113464,International Dollars
+MAM,2020,Location,Other compensation,17481,GBP,28593,GBP,7800,GBP,22677,USD,37000,USD,10421,USD,36775,International Dollars,60003,International Dollars,16900,International Dollars
+MAM,2020,Location,UK,40706,GBP,55000,GBP,28000,GBP,52710,USD,69342,USD,34728,USD,60697,International Dollars,79849,International Dollars,39990,International Dollars
+MAM,2020,Location,Other compensation,8889,GBP,40000,GBP,3000,GBP,11588,USD,52123,USD,3742,USD,13343,International Dollars,60021,International Dollars,4309,International Dollars
+MAM,2021,Industry,Overall,44201,GBP,96664,GBP,17536,GBP,60718,USD,133000,USD,24129,USD,72993,International Dollars,175184,International Dollars,27323,International Dollars
+MAM,2021,Industry,Other compensation,8490,GBP,33160,GBP,1000,GBP,11648,USD,46134,USD,1346,USD,14893,International Dollars,76061,International Dollars,2219,International Dollars
+MAM,2021,Industry,Consulting,45010,GBP,77395,GBP,27134,GBP,61776,USD,109714,USD,36745,USD,74224,International Dollars,175184,International Dollars,50839,International Dollars
+MAM,2021,Industry,Other compensation,7285,GBP,15000,GBP,2902,GBP,10006,USD,20148,USD,3917,USD,11922,International Dollars,22464,International Dollars,5350,International Dollars
+MAM,2021,Industry,Technology,46244,GBP,87107,GBP,17691,GBP,62980,USD,120107,USD,24274,USD,76517,International Dollars,126970,International Dollars,40020,International Dollars
+MAM,2021,Industry,Other compensation,12567,GBP,33160,GBP,4318,GBP,17216,USD,46134,USD,5776,USD,23352,International Dollars,76061,International Dollars,7264,International Dollars
+MAM,2021,Industry,Financial Services,42522,GBP,96664,GBP,17536,GBP,58625,USD,133000,USD,24129,USD,71148,International Dollars,133000,International Dollars,27323,International Dollars
+MAM,2021,Industry,Other compensation,8569,GBP,25401,GBP,1000,GBP,11763,USD,34950,USD,1346,USD,15737,International Dollars,34968,International Dollars,2219,International Dollars
+MAM,2021,Industry,Diversified Sectors,43375,GBP,65000,GBP,30000,GBP,60002,USD,90365,USD,40786,USD,66900,International Dollars,100755,International Dollars,45475,International Dollars
+MAM,2021,Industry,Other compensation,0,GBP,0,GBP,0,GBP,0,USD,0,USD,0,USD,0,International Dollars,0,International Dollars,0,International Dollars
+MAM,2021,Location,Overall,44201,GBP,96664,GBP,17536,GBP,60718,USD,133000,USD,24129,USD,72993,International Dollars,175184,International Dollars,27323,International Dollars
+MAM,2021,Location,Other compensation,8490,GBP,33160,GBP,1000,GBP,11648,USD,46134,USD,1346,USD,14893,International Dollars,76061,International Dollars,2219,International Dollars
+MAM,2021,Location,Asia,34272,GBP,57572,GBP,17691,GBP,46325,USD,77012,USD,24274,USD,72315,International Dollars,126970,International Dollars,40020,International Dollars
+MAM,2021,Location,Other compensation,9410,GBP,33160,GBP,1000,GBP,12822,USD,46134,USD,1346,USD,20715,International Dollars,76061,International Dollars,2219,International Dollars
+MAM,2021,Location,Europe (excl. UK),51782,GBP,87107,GBP,17536,GBP,70558,USD,120107,USD,24129,USD,84519,International Dollars,109464,International Dollars,27323,International Dollars
+MAM,2021,Location,Other compensation,7954,GBP,15838,GBP,3630,GBP,10912,USD,21838,USD,4556,USD,14208,International Dollars,34968,International Dollars,5350,International Dollars
+MAM,2021,Location,UK,42476,GBP,65000,GBP,30000,GBP,58665,USD,90365,USD,40786,USD,65410,International Dollars,100755,International Dollars,45475,International Dollars
+MAM,2021,Location,Other compensation,7237,GBP,15000,GBP,1500,GBP,9938,USD,20148,USD,2039,USD,11081,International Dollars,22464,International Dollars,2274,International Dollars
+MAM,2022,Industry,Overall,48529,GBP,116965,GBP,26441,GBP,60796,USD,135062,USD,29991,USD,69042,International Dollars,179427,International Dollars,36083,International Dollars
+MAM,2022,Industry,Other compensation,8510,GBP,58483,GBP,500,GBP,10588,USD,67531,USD,624,USD,12243,International Dollars,89713,International Dollars,655,International Dollars
+MAM,2022,Industry,Consulting,48112,GBP,65000,GBP,33000,GBP,62091,USD,85000,USD,40074,USD,70000,International Dollars,128750,International Dollars,42056,International Dollars
+MAM,2022,Industry,Other compensation,6503,GBP,14369,GBP,2000,GBP,8471,USD,19058,USD,2429,USD,9956,International Dollars,35068,International Dollars,2549,International Dollars
+MAM,2022,Industry,Technology,45864,GBP,80472,GBP,28667,GBP,56576,USD,97000,USD,36332,USD,64945,International Dollars,138684,International Dollars,36083,International Dollars
+MAM,2022,Industry,Other compensation,7922,GBP,16000,GBP,500,GBP,9986,USD,20448,USD,624,USD,10856,International Dollars,21459,International Dollars,655,International Dollars
+MAM,2022,Industry,Financial Services,59469,GBP,116965,GBP,36000,GBP,72599,USD,135062,USD,42678,USD,82021,International Dollars,179427,International Dollars,44789,International Dollars
+MAM,2022,Industry,Other compensation,17703,GBP,58483,GBP,1938,GBP,20741,USD,67531,USD,2652,USD,25030,International Dollars,89713,International Dollars,3523,International Dollars
+MAM,2022,Industry,Diversified Sectors,33252,GBP,40000,GBP,26441,GBP,37538,USD,46757,USD,29991,USD,44299,International Dollars,49069,International Dollars,37639,International Dollars
+MAM,2022,Industry,Other compensation,0,GBP,0,GBP,0,GBP,0,USD,0,USD,0,USD,0,International Dollars,0,International Dollars,0,International Dollars
+MAM,2022,Location,Overall,48529,GBP,116965,GBP,26441,GBP,60796,USD,135062,USD,29991,USD,69042,International Dollars,179427,International Dollars,36083,International Dollars
+MAM,2022,Location,Other compensation,8510,GBP,58483,GBP,500,GBP,10588,USD,67531,USD,624,USD,12243,International Dollars,89713,International Dollars,655,International Dollars
+MAM,2022,Location,Africa/Middle East,47181,GBP,54000,GBP,34790,GBP,58793,USD,69970,USD,46200,USD,117482,International Dollars,138684,International Dollars,85011,International Dollars
+MAM,2022,Location,Other compensation,0,GBP,0,GBP,0,GBP,0,USD,0,USD,0,USD,0,International Dollars,0,International Dollars,0,International Dollars
+MAM,2022,Location,Asia,52707,GBP,116965,GBP,26441,GBP,64289,USD,135062,USD,29991,USD,89061,International Dollars,179427,International Dollars,46190,International Dollars
+MAM,2022,Location,Other compensation,17663,GBP,58483,GBP,1938,GBP,20905,USD,67531,USD,2499,USD,28483,International Dollars,89713,International Dollars,3523,International Dollars
+MAM,2022,Location,Europe (excl. UK),49474,GBP,65000,GBP,31215,GBP,61518,USD,79950,USD,36332,USD,69182,International Dollars,91164,International Dollars,36083,International Dollars
+MAM,2022,Location,Other compensation,7055,GBP,12442,GBP,3185,GBP,9062,USD,16191,USD,3737,USD,10167,International Dollars,17384,International Dollars,4261,International Dollars
+MAM,2022,Location,UK,46741,GBP,100000,GBP,33000,GBP,58832,USD,112218,USD,35866,USD,61741,International Dollars,117767,International Dollars,37639,International Dollars
+MAM,2022,Location,Other compensation,7465,GBP,25000,GBP,500,GBP,9343,USD,28054,USD,624,USD,9805,International Dollars,29442,International Dollars,655,International Dollars

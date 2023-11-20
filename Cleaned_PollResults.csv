@@ -1,0 +1,53 @@
+,index, Sustainability, Public transport, Employment, Cost of living, Weather, Safety / crime rate, Social,Top5,New York - Rank,San Francisco - Rank,London - Rank,Berlin - Rank,Paris - Rank,Copenhagen - Rank,Dubai - Rank,Singapore - Rank,Shanghai - Rank,Tokyo - Rank,Mumbai - Rank,Sydney - Rank,Nomination
+0,2,7,2,1,3,4,6,5,"London,New York,Singapore,Shanghai,Tokyo",2,,1,,,,,3,4,5,,,Hong Kong
+1,3,7,5,1,6,2,3,4,"Sydney,Singapore,London,San Francisco,New York",5,4,3,,,,,2,,,,1,
+2,4,7,5,1,4,6,3,2,"London,New York,Sydney,San Francisco,Tokyo",2,4,1,,,,,,,5,,3,Zurich
+3,5,6,4,3,5,7,2,1,"Dubai,London,Mumbai,Tokyo,Singapore",,,2,,,,1,5,,4,3,,Chicago
+4,6,4,7,6,5,1,3,2,"Mumbai,San Francisco,New York,Tokyo,Dubai",3,2,,,,,5,,,4,1,,Indore
+5,7,3,7,2,4,5,1,6,"Sydney,London,Mumbai,Copenhagen,Singapore",,,2,,,4,,5,,,3,1,Reijkavik
+6,8,7,6,3,2,1,4,5,"New York,Singapore,Sydney,London,Berlin",1,,4,5,,,,2,,,,3,
+7,9,7,4,2,3,6,1,5,"Mumbai,London,Copenhagen,Berlin,Sydney",,,2,4,,3,,,,,1,5,
+8,10,7,3,2,5,4,6,1,"London,New York,San Francisco,Dubai,Sydney",2,3,1,,,,4,,,,,5,Miami
+9,11,7,6,1,5,3,4,2,"Dubai,Paris,London,San Francisco,Tokyo",,4,3,,2,,1,,,5,,,
+10,12,6,4,3,2,5,1,7,"Dubai,Singapore,Mumbai,Berlin,London",,,5,4,,,1,2,,,3,,Jabalpur
+11,13,7,6,1,2,5,3,4,"New York,Singapore,Sydney,London,Berlin",1,,4,5,,,,2,,,,3,
+12,14,7,6,1,2,5,3,4,"London,Sydney,Copenhagen,New York,Dubai",4,,1,,,3,5,,,,,2,
+13,15,7,4,2,1,6,3,5,"Singapore,London,Sydney,Berlin,Copenhagen",,,2,4,,5,,1,,,,3,
+14,16,5,4,3,7,6,2,1,"Berlin,London,Sydney,New York,San Francisco",4,5,2,1,,,,,,,,3,Frankfurt 
+15,17,5,3,6,7,2,1,4,"Shanghai,Singapore,London,Tokyo,Paris",,,3,,5,,,2,1,4,,,
+16,18,6,5,1,4,3,7,2,"Copenhagen,New York,London,Singapore,Berlin",2,,3,5,,1,,4,,,,,Stockholm
+17,19,7,5,1,6,4,3,2,"Copenhagen,Paris,London,New York,Berlin",4,,3,5,2,1,,,,,,,
+18,20,6,4,1,3,7,2,5,"London,Paris,San Francisco,New York,Copenhagen",4,3,1,,2,5,,,,,,,Chicago
+19,21,7,3,1,4,5,6,2,"London,Sydney,Tokyo,New York,Singapore",4,,1,,,,,5,,3,,2,Munich
+20,22,7,6,1,2,4,3,5,"Dubai,London,Singapore,Mumbai,New York",5,,2,,,,1,3,,,4,,Nope
+21,23,6,7,1,3,5,4,2,"London,New York,Paris,Copenhagen,Sydney",2,,1,,3,4,,,,,,5,Amsterdam
+22,24,4,7,1,5,6,3,2,"London,Singapore,San Francisco,Berlin,Mumbai",,3,1,4,,,,2,,,5,,Hong Kong
+23,25,6,7,2,3,4,1,5,"Paris,Copenhagen,Shanghai,Singapore,London",,,5,,1,2,,4,3,,,,
+24,26,7,5,3,4,2,1,6,"Shanghai,London,Paris,Singapore,Sydney",,,2,,3,,,4,1,,,5,no
+25,27,5,7,4,6,2,1,3,"Berlin,London,Tokyo,Sydney,San Francisco",,5,2,1,,,,,,3,,4,Xinjiang
+26,28,7,5,3,6,2,1,4,"London,Shanghai,Singapore,Paris,New York",5,,1,,4,,,3,2,,,,
+27,29,7,6,1,3,4,2,5,"Singapore,Shanghai,London,Copenhagen,New York",5,,3,,,4,,1,2,,,,Hongkong
+28,30,7,4,1,6,5,3,2,"New York,London,Singapore,Sydney,Shanghai",1,,2,,,,,3,5,,,4,Hong Kong
+29,31,4,3,1,7,6,2,5,"Paris,Tokyo,New York,Singapore,Dubai",3,,,,1,,5,4,,2,,,shanghai
+30,32,6,2,4,7,3,1,5,"Singapore,Tokyo,London,Dubai,Shanghai",,,3,,,,4,1,5,2,,,Bali
+31,33,7,6,2,3,4,5,1,"London,New York,San Francisco,Sydney,Singapore",2,3,1,,,,,5,,,,4,Toronto
+32,34,7,4,1,5,3,2,6,"Shanghai,Singapore,Tokyo,San Francisco,London",,4,5,,,,,2,1,3,,,
+33,35,6,5,2,3,4,1,7,"Shanghai,Singapore,Copenhagen,London,Paris",,,4,,5,3,,2,1,,,,Hong Kong
+34,36,7,6,2,1,3,4,5,"Mumbai,London,New York,Singapore,Dubai",3,,2,,,,5,4,,,1,,
+35,37,7,5,1,6,3,2,4,"London,Shanghai,Singapore,New York,Paris",4,,1,,5,,,3,2,,,,Hong Kong
+36,38,3,5,7,6,1,4,2,"London,Paris,Copenhagen,Shanghai,New York",5,,1,,2,3,,,4,,,,Beijing
+37,39,7,5,3,2,6,1,4,"London,New York,Shanghai,Singapore,Tokyo",2,,1,,,,,4,3,5,,,Hong Kong
+38,40,7,4,1,3,2,5,6,"Shanghai,Singapore,Tokyo,London,New York",5,,4,,,,,2,1,3,,,Hong Kong
+39,41,6,4,1,3,7,2,5,"Shanghai,London,Singapore,Tokyo,Dubai",,,2,,,,5,3,1,4,,,Hong Kong
+40,42,7,6,1,5,3,2,4,"Copenhagen,Tokyo,New York,London,Shanghai",3,,4,,,1,,,5,2,,,Hong Kong
+41,43,7,6,1,4,5,3,2,"London,Copenhagen,New York,Berlin,Paris",3,,1,4,5,2,,,,,,,"Munich, Germany"
+42,44,7,2,4,6,3,1,5,"London,Singapore,Dubai,Copenhagen,Tokyo",,,1,,,4,3,2,,5,,,
+43,45,7,3,2,4,5,1,6,"Singapore,London,Copenhagen,Shanghai,Tokyo",,,2,,,3,,1,4,5,,,
+44,46,7,6,1,2,5,3,4,"San Francisco,Paris,New York,Sydney,Copenhagen",3,1,,,2,5,,,,,,4,Munich
+45,47,7,6,5,2,4,1,3,"Tokyo,Sydney,Shanghai,Berlin,Copenhagen",,,,4,,5,,,3,1,,2,
+46,48,6,4,1,7,5,3,2,"London,Sydney,Paris,Shanghai,Dubai",,,1,,3,,5,,4,,,2,
+47,49,6,5,1,3,4,7,2,"Shanghai,London,Tokyo,New York,Singapore",4,,2,,,,,5,1,3,,,Beijing
+48,50,6,3,1,7,5,2,4,"London,Dubai,Singapore,Mumbai,Berlin",,,1,5,,,2,3,,,4,,
+49,51,7,5,1,4,6,3,2,"London,San Francisco,New York,Dubai,Mumbai",3,2,1,,,,4,,,,5,,
+50,52,3,7,2,4,1,5,6,"San Francisco,New York,Sydney,London,Paris",2,1,4,,5,,,,,,,3,Munich
+51,53,7,5,1,4,3,6,2,"New York,London,San Francisco,Sydney,Copenhagen",1,3,2,,,5,,,,,,4,"Munich, Hamburg"

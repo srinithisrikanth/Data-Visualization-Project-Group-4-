@@ -1,0 +1,55 @@
+---
+title: "data_viz_group_assignment"
+output: html_document
+date: "2023-11-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r load data, fig.width=8, fig.height=3.5}
+# Reading file. Data from: http://www.citycarbonfootprints.info
+
+  excel_file_path <- "sustainable cities - data.xlsx"
+  data <- read_excel(excel_file_path)
+  data <- data[-1, , drop = FALSE] %>%
+    mutate(per_capita_est_center = as.double(`Footprint per Capita (t CO2/cap) - estimation center`),
+           per_capita_margin = as.double(`Footprint per Capita (t CO2/cap) - margin`),
+           per_capita_upper_bound = per_capita_est_center + per_capita_margin,
+           per_capita_lower_bound = per_capita_est_center - per_capita_margin,
+           `Urban Cluster` = fct_reorder(`Urban Cluster`, per_capita_est_center)) %>% 
+    arrange(per_capita_est_center)
+  
+  ggplot(data) +
+    geom_col(aes(x = `Urban Cluster`,
+                 y = per_capita_est_center), 
+             fill = "skyblue") +
+     geom_errorbar(aes(x = `Urban Cluster`,
+                       ymin = per_capita_lower_bound,
+                       ymax = per_capita_upper_bound,
+                       color = "Estimation range"),
+                   width = 0.3) +
+    coord_flip() +
+    labs(title = "Emissions per capita per city",
+         y = "CO2e emissions per capita (t CO2/cap)", 
+         x = "City") +
+    scale_color_manual(values = "darkblue",   # Color for the error bars
+                     labels = "Estimation range") + 
+    #guides(color = "none") +
+    theme_bw() +
+    theme(panel.border = element_blank(),
+          panel.grid = element_blank(),
+          plot.title = element_text(hjust = -0.29),
+          legend.title=element_blank(),
+          legend.position = c(0.85, 0.2),  # Set legend position
+          legend.justification = "top",  # Set legend justification
+          legend.box.just = "right",
+          axis.text.y = element_text(angle = 0))
+
+
+```

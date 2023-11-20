@@ -1,0 +1,81 @@
+---
+title: "ClassPollViz"
+author: "Jingcheng Wu"
+date: "2023-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(janitor)
+library(tidyverse)
+```
+
+```{r}
+poll = read_csv('Cleaned_PollResults.csv',show_col_types = FALSE)
+```
+
+```{r}
+city_counts <- poll %>%
+  separate_rows(Top5, sep = ",") %>%
+  group_by(Top5) %>%
+  summarise(count = n()) %>%
+  as_tibble()
+
+city_counts
+```
+
+```{r}
+city_counts %>% 
+  arrange(desc(count)) %>%
+  mutate(isTop = ifelse(row_number() <= 5, "Top 5", "Others")) %>% 
+  ggplot(aes(y = count, x = reorder(Top5, count), fill = isTop)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Top 5" = "#001E62", "Others" = "grey")) +
+  coord_flip() +
+  labs(fill = "Category", x = "City", y = "No. of Mentions Among Top 5") +
+  theme(legend.position = "none")
+```
+
+```{r}
+factors <- poll[, 3:9]
+factors
+```
+```{r}
+avg_factors <- factors %>%
+  # clean_names() %>%
+  colMeans() %>% 
+  enframe()
+
+avg_factors %>% 
+  # ggplot(aes(y = value, x = reorder(name, -value))) +
+  ggplot(aes(y = (7 - value), x = reorder(name, (7 - value)))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Aspect", y = "Average Score") +
+  theme(legend.position = "none")
+
+avg_factors
+```
+```{r}
+city_rankings <- poll[, (ncol(poll)-11):ncol(poll)-1]
+city_rankings %>% 
+  colMeans(na.rm = TRUE) %>% 
+  enframe() %>% 
+  # ggplot(aes(y = value, x = reorder(name, -value))) +
+  ggplot(aes(y = (7 - value), x = reorder(name, (7 - value)))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Aspect", y = "Average Score") +
+  theme(legend.position = "none")
+```
+```{r}
+# Use the average ranking of the factors to come up with the weights in percentages for our model:
+
+avg_factors %>% 
+  mutate(rev_factors = 7 - value) %>% 
+  mutate(weight_pct = rev_factors / sum(rev_factors) * 100) %>% 
+  select(name, rev_factors, weight_pct)
+```
+

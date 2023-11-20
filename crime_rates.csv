@@ -1,0 +1,61 @@
+﻿city,year,crime_rate
+London,2018,"9,800"
+London,2019,"10,240.00"
+London,2020,"8,330.00"
+London,2021,"9,280.00"
+London,2022,"10,090.00"
+Dubai,2018,33.40
+Dubai,2019,32.50
+Dubai,2020,31.20
+Dubai,2021,29.40
+Dubai,2022,33.70
+Singapore,2018,587
+Singapore,2019,616
+Singapore,2020,656
+Singapore,2021,847
+Singapore,2022,931
+New York,2018,"1,128"
+New York,2019,"1,125"
+New York,2020,"1,125"
+New York,2021,"1,209"
+New York,2022,"1,489"
+Copenhagen,2018,"6,732"
+Copenhagen,2019,"7,236"
+Copenhagen,2020,"5,941"
+Copenhagen,2021,"5,476"
+Copenhagen,2022,"6,274"
+Shanghai,2018,543
+Shanghai,2019,521
+Shanghai,2020,512
+Shanghai,2021,539
+Shanghai,2022,474
+Paris,2018,5473.232353
+Paris,2019,5645.233824
+Paris,2020,4984.451471
+Paris,2021,5392.426471
+Paris,2022,5766.711765
+Tokyo,2018,967.5
+Tokyo,2019,887.25
+Tokyo,2020,730.5
+Tokyo,2021,679.05
+Tokyo,2022,668.25
+San Francisco,2018,7097.2
+San Francisco,2019,6819.7
+San Francisco,2020,5102
+San Francisco,2021,5802.5
+San Francisco,2022,6085
+Berlin,2018,10065
+Berlin,2019,9822
+Berlin,2020,9579
+Berlin,2021,9105
+Berlin,2022,14135
+Sydney,2018,3104.159533
+Sydney,2019,3271.284
+Sydney,2020,2555.87
+Sydney,2021,2618.58
+Sydney,2022,2827.6
+Mumbai,2018,204.395122
+Mumbai,2019,204.5414634
+Mumbai,2020,249.1121951
+Mumbai,2021,315.395122
+Mumbai,2022,343.2536585

@@ -1,0 +1,922 @@
+---
+title: "Data Visualization - Group Project _ Jean"
+author: "Jean Zwerger"
+date: "2023-11-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center")
+```
+
+```{r, load_libraries, include = FALSE}
+library(tidyverse)
+library(lubridate)
+library(vroom)
+library(janitor)
+library(skimr)
+library(vroom)
+library(mice) 
+library(VIM)
+library(countrycode)
+library(rvest)
+library(knitr)
+library(readxl)
+```
+
+
+> **Goal:** Rank a predefined set of cities across multiple topics to define which are the best to live in. --\>
+
+> **Guidelines** everyone is assigned to a topic and creates 2-3 for each need datasets that capture all cities in scope (careful about different methodologies) Suggestion: can find research papers instead of raw data --\>
+
+
+
+
+# Cost of Living
+
+To assess cost of living across the different cities in scope, we will look at three dimensions. How much income, living expenses, and price fluctuations (captured by inflation) are expected in the cities of choice.
+
+
+
+
+## Income: Salary
+
+In this section, we will put the average MAM graduate salary into the context of the chosen cities.
+
+I tried the below two approaches to scrap data from the pdfs directly. Unfortunately, initial results were insufficient, so I proceeded to copy paste the pdf data into an excel before tidying up the data in R.
+
+
+### LBS MAM Wages 2022: Experiment 1 - Pdf Extraction with Tesseract OCR
+
+```{r, tesseract}
+
+# Load the libraries
+library(tesseract)
+library(magrittr)
+
+# Set up the Tesseract OCR engine
+engine <- tesseract("eng")
+
+# Path to the image file
+image_path <- "C:/Users/jeanz/Documents/Data Visualization/MAM 2022.png" # Replace with your actual image path
+
+# Perform OCR on the image
+text <- ocr(image_path, engine = engine)
+print(text)
+
+# ======
+# RESULT
+# ======
+# [1] "Salary information by industry\n| eee | rc\nIndustry Mean Max = Min. Mean Max Min.) Mean Max Min\noverall £49529 EN6IES £25461 $60.796 $1ESOG2 $2999 $69042 $179,427 $56085\nSalary information by location\nLocation Mean Max = Min Mean Max = Min. = Mean.) Max Min\nOverall £48529 EN69ES £26,461 $50.796 SIESOS2 $29,991 $69062 $179,427 $36083\n‘Africa/Middle East. «£47361 £54000 £34790 $58,793 $69970 $46200 $7482 $138.64 $850\nAsia £52707 £16965 £26,461 $66,289 $135,062 $29951 $83,061 $173427 $46390\nEurope (excl.UK) £49,474 £65000 E1215 SEISIG $79950 $36552 $ER182 $1164 $36,083\nUK £46741 €100.000 £55000 $8552 S278 $55865 $SL74 $7767 $57,659\n"
+# ======
+
+```
+
+
+### LBS MAM Wages 2022: Experiment 2 - PDF Extraction with Tabulizer Table Extractor
+
+```{r, tabulizer}
+
+# Load the pdftools and tabulizer packages
+library(pdftools)
+library(tabulizer)
+
+# Specify the path to the PDF file
+pdf_path <- "C:/Users/jeanz/Documents/Data Visualization/MAM_Employment Report_2022.pdf" # Replace with the actual file path
+
+# Extract tables from page 6
+tables <- extract_tables(pdf_path, pages = 6)
+
+# Print the extracted tables
+print(tables)
+
+
+# ======
+# RESULT
+# ======
+# [[1]]
+#      [,1]         [,2]      [,3]      [,4]      [,5]      [,6]      [,7]      [,8]      [,9]
+# [1,] "CONSULTING" "£48,112" "£65,000" "£33,000" "$62,091" "$85,000" "$40,074" "$70,000" "$128,750"
+#      [,10]
+# [1,] "$42,056"
+# 
+# [[2]]
+#      [,1]      [,2]      [,3]       [,4]      [,5]      [,6]       [,7]      [,8]      [,9]
+# [1,] "FINANCE" "£59,469" "£116,965" "£36,000" "$72,599" "$135,062" "$42,678" "$82,021" "$179,427"
+#      [,10]
+# [1,] "$44,789"
+# 
+# [[3]]
+#      [,1]          [,2]      [,3]      [,4]      [,5]      [,6]      [,7]      [,8]      [,9]
+# [1,] "DIVERSIFIED" "£33,252" "£40,000" "£26,441" "$37,538" "$46,757" "$29,991" "$44,299" "$49,069"
+#      [,10]
+# [1,] "$37,639"
+# ======
+
+```
+
+
+### LBS MAM Wages 2022: Loading and Tidying Up Data from Excel
+
+```{r, loaddata_salary}
+
+# LBS MAM employment reports 2020, 2021, 2022
+
+
+# Load raw data
+df <- read_csv("C:/Users/jeanz/Documents/Data Visualization/Employment Report _ Salary Report.csv")
+glimpse(df)
+
+# Clean the Data
+# Identify 'Other compensation' rows
+other_comp <- df %>%
+  filter(Breakdown == "Other compensation") %>% 
+  mutate(Index = row_number())
+
+# Remove these rows from the original dataframe
+main <- df %>%
+  filter(Breakdown != "Other compensation") %>% 
+  mutate(Index = row_number())
+
+# Combine both dataframes by indexing corresponding rows
+df_combined <- left_join(main, other_comp, by = c("Index"))
+
+# Merge Mean, Min, Max columns together between base wages and other compensations to get total wages
+df_transformed <- df_combined %>%
+  # Drop specified columns
+  select(-Index, -ends_with(".y")) %>%
+  # Rename columns
+  rename(Program = Programs.x, Year = Year.x, Category = Category.x, Breakdown = Breakdown.x,
+         GBPMean_Value = Mean...5.x, GBPMax_Value = Max...7.x, GBPMin_Value = Min...9.x,
+         USDMean_Value = Mean...11.x, USDMax_Value = Max...13.x, USDMin_Value = Min...15.x,
+         INTMean_Value = Mean...17.x, INTMax_Value = Max...19.x, INTMin_Value = Min...21.x,
+         GBPMean_Currency = Currency...6.x, GBPMax_Currency = Currency...8.x, GBPMin_Currency = Currency...10.x,
+         USDMean_Currency = Currency...12.x, USDMax_Currency = Currency...14.x, USDMin_Currency = Currency...16.x,
+         INTMean_Currency = Currency...18.x, INTMax_Currency = Currency...20.x, INTMin_Currency = Currency...22.x) %>%
+  # Sum corresponding values
+  mutate(GBPMean_Value = GBPMean_Value + df_combined$Mean...5.y,
+         GBPMax_Value = GBPMax_Value + df_combined$Max...7.y,
+         GBPMin_Value = GBPMin_Value + df_combined$Min...9.y,
+         USDMean_Value = USDMean_Value + df_combined$Mean...11.y,
+         USDMax_Value = USDMax_Value + df_combined$Max...13.y,
+         USDMin_Value = USDMin_Value + df_combined$Min...15.y,
+         INTMean_Value = INTMean_Value + df_combined$Mean...17.y,
+         INTMax_Value = INTMax_Value + df_combined$Max...19.y,
+         INTMin_Value = INTMin_Value + df_combined$Min...21.y)
+
+# Pivot the "_Value" columns
+df_values <- df_transformed %>%
+  select(Program, Year, Category, Breakdown, ends_with("_Value")) %>%
+  pivot_longer(
+    cols = ends_with("_Value"),
+    names_to = c("Currency", "Type"),
+    names_pattern = "(GBP|USD|INT)(Mean|Max|Min)_Value",
+    values_to = "Total_Wages",
+    values_drop_na = TRUE
+  )
+
+# Pivot the "_Currency" columns
+df_currency <- df_transformed %>%
+  select(Program, Year, Category, Breakdown, ends_with("_Currency")) %>%
+  pivot_longer(
+    cols = ends_with("_Currency"),
+    names_to = c("Currency", "Type"),
+    names_pattern = "(GBP|USD|INT)(Mean|Max|Min)_Currency",
+    values_to = "Currency_Type",
+    values_drop_na = TRUE
+  )
+
+# Join the two dataframes based on their common columns
+df_long <- left_join(df_values, df_currency, by = c("Program", "Year", "Category", "Breakdown", "Type", "Currency"))
+
+# Convert Currency prefix to actual currency name
+df_long <- df_long %>%
+  mutate(Currency = case_when(
+    Currency == "GBP" ~ "UK Pounds",
+    Currency == "USD" ~ "American Dollars",
+    Currency == "INT" ~ "International Dollars",
+    TRUE ~ NA_character_
+  )) %>%
+  select(-Currency_Type) # Remove the redundant Currency_Type column
+
+glimpse(df_long)
+
+
+# Prepare data for visualization
+# Filter out only the values needed for the visualization
+Location_mean_total_wages_USD_2022 <- df_long %>% 
+  filter(Currency == "American Dollars" & Type == "Mean" & Category == "Location" & Year == "2022")
+
+# Define the mapping from 'Breakdown' to cities
+breakdown_to_city <- c(
+  "Overall" = "New York, United States of America; San Francisco, United States of America",
+  "UK" = "London, United Kingdom",
+  "Europe (excl. UK)" = "Berlin, Germany; Paris, France; Copenhagen, Denmark",
+  "Africa/Middle East" = "Dubai, United Arab Emirates",
+  "Asia" = "Singapore, Singapore; Shanghai, China; Tokyo, Japan; Mumbai, India; Sydney, Australia"
+)
+
+# Transform the dataframe
+Location_mean_total_wages_USD_2022_cities <- df_long %>% 
+  filter(Currency == "American Dollars" & Type == "Mean" & Category == "Location" & Year == 2022) %>%
+  mutate(City = breakdown_to_city[Breakdown]) %>%
+  separate_rows(City, sep = "; ") %>% # Split the cities into separate rows if multiple cities are
+  rename('Mean Total Wage' = Total_Wages, Region = Breakdown) %>%
+  separate(City, into = c("City", "Country"), sep = ", ", extra = "merge") %>%
+  select(City, Country, Region, Currency, 'Mean Total Wage') %>% 
+  arrange(desc(`Mean Total Wage`))
+
+# Print "MAM Graduate Mean Wages across Geographies in 2022" table
+print(Location_mean_total_wages_USD_2022_cities)
+
+
+glimpse(Location_mean_total_wages_USD_2022_cities)
+
+unique(Location_mean_total_wages_USD_2022_cities$City)
+
+```
+
+
+### Average Salary by City: Scrap and Load
+
+```{r, }
+
+# Alternative data source: OECD
+# "Average salary by country"
+# https://data.oecd.org/earnwage/average-wages.htm
+# HOWEVER = not enough data in OECD source
+
+# Source: https://www.numbeo.com/cost-of-living/prices_by_city.jsp?displayCurrency=USD&itemId=105
+
+url_numbeo_average_salary <- "https://www.numbeo.com/cost-of-living/prices_by_city.jsp?displayCurrency=USD&itemId=105"
+
+# Read the HTML content from the page
+url_numbeo_average_salary_html <- read_html(url_numbeo_average_salary)
+
+# Find the table using the specific CSS selector
+url_numbeo_average_salary_table_node <- html_nodes(url_numbeo_average_salary_html, "table#t2")
+
+# Extract the table into a dataframe
+url_numbeo_average_salary_data <- html_table(url_numbeo_average_salary_table_node, fill = TRUE)
+
+# The table is usually in the first list element
+url_numbeo_average_salary_df <- url_numbeo_average_salary_data[[1]]
+
+numbeo_average_monthly_salary_filtered <- url_numbeo_average_salary_df %>% 
+  select(-Rank) %>%
+  separate(City, into = c("City", "Country"), sep = ", ", extra = "merge") %>%
+  mutate(City = trimws(City), Country = trimws(Country)) %>%
+  filter(City %in% c("New York", "San Francisco",
+                     "London", "Berlin", "Paris", "Copenhagen",
+                     "Dubai",
+                     "Singapore", "Shanghai", "Tokyo", "Mumbai",
+                     "Sydney"))%>%
+  mutate(Country = ifelse(City %in% c("New York", "San Francisco"), "United States of America", Country)) %>%
+  filter(!(City == "London" & Country == "Canada"))
+
+numbeo_average_annual_salary_filtered <- numbeo_average_monthly_salary_filtered %>% 
+  mutate(`Average Annual Net Salary (After Tax)` = `Average Monthly Net Salary (After Tax)` * 12) %>% 
+  select(-"Average Monthly Net Salary (After Tax)") %>% 
+  arrange(desc(`Average Annual Net Salary (After Tax)`))
+
+numbeo_average_annual_salary_filtered
+glimpse(numbeo_average_annual_salary_filtered)
+
+```
+
+
+### Plot Salary Visualization
+
+```{r, plot_salary}
+
+# Join the two data frames on both "City" and "Country" columns
+combined_df <- left_join(numbeo_average_annual_salary_filtered, Location_mean_total_wages_USD_2022_cities, by = c("City", "Country"))
+
+# Select specific columns to view
+selected_combined_df <- combined_df %>% 
+  select(City, Country, Region, Currency, `Average Annual Net Salary (After Tax)`, `Mean Total Wage`) %>% 
+  rename(
+    `Average Annual Net Salary` = `Average Annual Net Salary (After Tax)`,
+    `MAM Graduate Salary` = `Mean Total Wage`)
+
+# Get a glimpse of the selected columns in the combined data frame
+glimpse(selected_combined_df)
+
+
+# Assuming selected_combined_df is your combined data frame with the correct columns
+difference_df <- selected_combined_df %>%
+  mutate(Difference = `MAM Graduate Salary` - `Average Annual Net Salary`)
+
+# Function to create and adjust plot
+create_adjusted_plot <- function() {
+  ggplot(difference_df, aes(x = reorder(City, Difference), y = `Average Annual Net Salary`)) +
+    geom_col(fill = "#D7E8CD") +  # This creates the bars for average annual net salary
+    geom_point(aes(y = `MAM Graduate Salary`), color = "#0c530c", size = 5) +  # This adds the points for MAM graduate salary
+    labs(title = "Average MAM Graduate Wage Compared to Average Net Wage per City",
+       x = "",
+       y = "Average Wage in US Dollars") +
+    theme_minimal() +
+    theme(plot.title = element_text(size = 36, hjust = 0),
+          axis.title = element_text(size = 30),
+          axis.text = element_text(size = 30)) +
+    coord_flip()
+}
+
+# Create the plot
+plot1_salary <- create_adjusted_plot()
+
+
+# Print the plot to match the desired aspect ratio
+# (this will only work if your graphics device window is resized to match the aspect ratio)
+print(plot1_salary)
+
+# Save the plot with the specified dimensions
+ggsave("plot1_salary.png", plot = plot1_salary, width = 20, height = 10)
+
+
+# # If Ordering by order of average salaries
+# # Create the chart
+# plot <- ggplot(selected_combined_df, aes(x = reorder(City, `Average Annual Net Salary`), y = `Average Annual Net Salary`)) +
+#   geom_col(fill = "grey") +  # This creates the bars for average annual net salary
+#   geom_point(aes(y = `MAM Graduate Salary`), color = "#08a045", size = 3) +  # This adds the points for MAM graduate salary
+#   labs(title = "Comparison of Average Annual Net Salary and MAM Graduate Wage",
+#        x = "USD",
+#        y = "City") +
+#   theme_minimal() +
+#   coord_flip() +  # Flip the axes so cities are on the y-axis
+#   theme(axis.text.y = element_text(angle = 0))  # Ensure y-axis labels are horizontal
+# 
+# plot
+
+
+  
+```
+
+
+
+
+## Living Expenses: Shopping Basket
+
+Let's now discover how much of our income is expected to be used on average living expenses in each city.
+
+
+### Cost of Living: Scrap and Load the Data
+
+```{r, scrapdata_cost_of_living}
+
+# **Source:** <https://www.numbeo.com/cost-of-living/prices_by_city.jsp?displayCurrency=USD&itemId=101&itemId=100&itemId=228&itemId=224&itemId=60&itemId=66&itemId=64&itemId=62&itemId=110&itemId=118&itemId=121&itemId=14&itemId=19&itemId=17&itemId=15&itemId=11&itemId=16&itemId=113&itemId=9&itemId=12&itemId=8&itemId=119&itemId=111&itemId=112&itemId=115&itemId=116&itemId=13&itemId=27&itemId=26&itemId=29&itemId=28&itemId=114&itemId=6&itemId=4&itemId=5&itemId=3&itemId=2&itemId=1&itemId=7&itemId=105&itemId=106&itemId=44&itemId=40&itemId=42&itemId=24&itemId=20&itemId=18&itemId=109&itemId=108&itemId=107&itemId=206&itemId=25&itemId=30&itemId=33&itemId=34>
+
+
+# URL of the page to scrape
+url_numbeo_cost_of_living <- "https://www.numbeo.com/cost-of-living/prices_by_city.jsp?displayCurrency=USD&itemId=101&itemId=100&itemId=228&itemId=224&itemId=60&itemId=66&itemId=64&itemId=62&itemId=110&itemId=118&itemId=121&itemId=14&itemId=19&itemId=17&itemId=15&itemId=11&itemId=16&itemId=113&itemId=9&itemId=12&itemId=8&itemId=119&itemId=111&itemId=112&itemId=115&itemId=116&itemId=13&itemId=27&itemId=26&itemId=29&itemId=28&itemId=114&itemId=6&itemId=4&itemId=5&itemId=3&itemId=2&itemId=1&itemId=7&itemId=105&itemId=106&itemId=44&itemId=40&itemId=42&itemId=24&itemId=20&itemId=18&itemId=109&itemId=108&itemId=107&itemId=206&itemId=25&itemId=30&itemId=33&itemId=34"
+
+# Read the HTML content from the page
+numbeo_cost_of_living_html <- read_html(url_numbeo_cost_of_living)
+
+# Find the table using the specific CSS selector
+cost_of_living_table_node <- html_nodes(numbeo_cost_of_living_html, "table#t2")
+
+# Extract the table into a dataframe
+cost_of_living_data <- html_table(cost_of_living_table_node, fill = TRUE)
+
+# The table is usually in the first list element
+cost_of_living_df <- cost_of_living_data[[1]]
+
+# Get the names of the dataframe
+col_names <- names(cost_of_living_df)
+
+# Rename the duplicate columns
+col_names[6] <- "Domestic Beer (0.5 liter draught), Restaurant"
+col_names[7] <- "Imported Beer (0.33 liter bottle), Restaurant"
+col_names[16] <- "Domestic Beer (0.5 liter draught), Supermarket"
+col_names[17] <- "Imported Beer (0.33 liter bottle), Supermarket"
+col_names[8] <- "Coke/Pepsi (0.33 liter bottle), Restaurant"
+col_names[9] <- "Water (0.33 liter bottle), Restaurant"
+
+# Assign the new names back to the dataframe
+names(cost_of_living_df) <- col_names
+
+# Now remove the 'Rank' column
+cost_of_living_df <- cost_of_living_df %>% select(-Rank)
+
+# Split the City column into City and Country
+cost_of_living_df <- cost_of_living_df %>%
+  separate(City, into = c("City", "Country"), sep = ", ")
+
+# Remove any leading or trailing spaces in City and Country columns
+cost_of_living_df <- cost_of_living_df %>%
+  mutate(City = trimws(City), Country = trimws(Country))
+
+# Filter for specific cities if needed
+cost_of_living_df_filtered <- cost_of_living_df %>%
+  filter(City %in% c("New York", "San Francisco",
+                     "London", "Berlin", "Paris", "Copenhagen",
+                     "Dubai",
+                     "Singapore", "Shanghai", "Tokyo", "Mumbai",
+                     "Sydney"))
+
+# Replace state abbreviations for specific cities with "United States of America"
+cost_of_living_df_filtered <- cost_of_living_df_filtered %>%
+  mutate(Country = ifelse(City %in% c("New York", "San Francisco") & 
+                          Country %in% c("NY", "CA"), 
+                          "United States of America", Country))
+
+# Pivot Longer with Column Numbers
+cost_of_living_df_tidy <- cost_of_living_df_filtered %>%
+  pivot_longer(
+    cols = -c(City, Country), 
+    names_to = "Variable", 
+    values_to = "Value",
+    names_pattern = "(.*)",
+    names_repair = "universal"
+  ) %>%
+  mutate(ColumnNumber = as.numeric(gsub("...\\.(.*)", "\\1", rownames(.))))
+
+# Categorize Using grepl
+cost_of_living_df_tidy <- cost_of_living_df_tidy %>%
+  mutate(Category = case_when(
+    grepl("Restaurant|McMeal|Cappuccino", Variable) ~ "Food & Beverages",
+    grepl("Beer|Bottle of Wine|Cigarettes", Variable) ~ "Alcohol & Tobacco",
+    grepl("Milk|Bread|Eggs|Cheese|Chicken|Beef|1.5 liter bottle|Apples|Oranges|Potato|Lettuce|Rice|Tomato|Banana|Onion", Variable) ~ "Groceries",
+    grepl("Apartment|Price per Square Meter|Basic|Mortgage", Variable) ~ "Housing & Utilities",
+    grepl("Internet|Mobile Phone", Variable) ~ "Communication",
+    grepl("Fitness Club|Tennis Court|Cinema", Variable) ~ "Leisure & Recreation",
+    grepl("Jeans|Summer Dress|Nike Running Shoes|Leather Business Shoes", Variable) ~ "Clothing & Footwear",
+    grepl("Taxi|Gasoline|Volkswagen Golf|Toyota Corolla Sedan|Transport|Monthly Pass", Variable) ~ "Transportation",
+    grepl("Preschool|Primary School", Variable) ~ "Education",
+    grepl("Salary", Variable) ~ "Salary",
+    TRUE ~ "Other"
+  ))
+
+# Reorder columns and drop ColumnNumber
+cost_of_living_df_tidy <- cost_of_living_df_tidy %>%
+  select(City, Country, Category, Variable, Value) %>% 
+  arrange(City)
+
+# Create a mapping data frame for Number_of_Purchases_per_Month
+purchases_per_month <- data.frame(
+  Variable = c(
+    "Bottle of Wine (Mid-Range)", 
+    "Domestic Beer (0.5 liter draught), Supermarket", 
+    "Imported Beer (0.33 liter bottle), Supermarket", 
+    "Cigarettes 20 Pack (Marlboro)", 
+    "1 Pair of Jeans (Levis 501 Or Similar)", 
+    "1 Summer Dress in a Chain Store (Zara, H&M, ...)", 
+    "1 Pair of Nike Running Shoes (Mid-Range)", 
+    "1 Pair of Men Leather Business Shoes", 
+    "Internet (60 Mbps or More, Unlimited Data, Cable/ADSL)", 
+    "Mobile Phone Monthly Plan with Calls and 10GB+ Data", 
+    "Preschool (or Kindergarten), Full Day, Private, Monthly for 1 Child", 
+    "International Primary School, Yearly for 1 Child", 
+    "Meal, Inexpensive Restaurant", 
+    "Meal for 2 People, Mid-range Restaurant, Three-course", 
+    "McMeal at McDonalds (or Equivalent Combo Meal)", 
+    "Domestic Beer (0.5 liter draught), Restaurant", 
+    "Imported Beer (0.33 liter bottle), Restaurant", 
+    "Coke/Pepsi (0.33 liter bottle), Restaurant", 
+    "Water (0.33 liter bottle), Restaurant", 
+    "Cappuccino (regular)", 
+    "Milk (regular), (1 liter)", 
+    "Loaf of Fresh White Bread (500g)", 
+    "Eggs (regular) (12)", 
+    "Local Cheese (1kg)", 
+    "Water (1.5 liter bottle)", 
+    "Chicken Fillets (1kg)", 
+    "Apples (1kg)", 
+    "Oranges (1kg)", 
+    "Potato (1kg)", 
+    "Lettuce (1 head)", 
+    "Rice (white), (1kg)", 
+    "Tomato (1kg)", 
+    "Banana (1kg)", 
+    "Onion (1kg)", 
+    "Beef Round (1kg) (or Equivalent Back Leg Red Meat)", 
+    "Apartment (1 bedroom) in City Centre", 
+    "Apartment (1 bedroom) Outside of Centre", 
+    "Apartment (3 bedrooms) in City Centre", 
+    "Apartment (3 bedrooms) Outside of Centre", 
+    "Basic (Electricity, Heating, Cooling, Water, Garbage) for 85m2 Apartment", 
+    "Price per Square Meter to Buy Apartment in City Centre", 
+    "Price per Square Meter to Buy Apartment Outside of Centre", 
+    "Mortgage Interest Rate in Percentages (%), Yearly, for 20 Years Fixed-Rate", 
+    "Fitness Club, Monthly Fee for 1 Adult", 
+    "Tennis Court Rent (1 Hour on Weekend)", 
+    "Cinema, International Release, 1 Seat", 
+    "Average Monthly Net Salary (After Tax)", 
+    "One-way Ticket (Local Transport)", 
+    "Monthly Pass (Regular Price)", 
+    "Gasoline (1 liter)", 
+    "Volkswagen Golf 1.4 90 KW Trendline (Or Equivalent New Car)", 
+    "Toyota Corolla Sedan 1.6l 97kW Comfort (Or Equivalent New Car)", 
+    "Taxi Start (Normal Tariff)", 
+    "Taxi 1km (Normal Tariff)", 
+    "Taxi 1hour Waiting (Normal Tariff)"
+  ),
+  Number_of_Purchases_per_Month = c(
+    2, 2, 4, 6, 1, 1, 0.5, 0.4, 
+    1, 1, 0, 0, 2, 4, 4, 2, 4, 
+    4, 6, 12, 3, 3, 3, 0.8, 12, 
+    1.8, 0.8, 0.8, 2, 2, 2, 1, 
+    1, 0.4, 1.2, 1, 0, 0, 0, 
+    0.5, 0, 0, 0, 1, 4, 1, 0, 
+    0, 1, 40, 0, 0, 4, 
+    10, 0
+  )
+)
+
+# Join the mapping with the cost of living data
+cost_of_living_df_tidy <- left_join(cost_of_living_df_tidy, purchases_per_month, by = "Variable")
+
+# Make sure categorization was successful
+# Extract unique pairs of Category and Variable
+ variable_category_pairs <- cost_of_living_df_tidy %>%
+   select(Category, Variable, Number_of_Purchases_per_Month) %>%
+   distinct() %>% 
+   arrange(Category)
+print(variable_category_pairs)
+
+# Calculate Monthly Expenses
+cost_of_living_df_monthly_tidy <- cost_of_living_df_tidy %>%
+  mutate(Monthly_Expenses = Value * Number_of_Purchases_per_Month) %>% 
+  select(-Value, - Number_of_Purchases_per_Month)
+
+# View the updated dataframe
+print(cost_of_living_df_monthly_tidy)
+
+cost_of_living_df_monthly_tidy %>% 
+  filter(City == "Singapore")
+
+
+```
+
+
+### Plot Cost of Living Visualization
+
+```{r, plot_living_expenses}
+
+# First, Order the cities based on the total Monthly_Expenses in descending order
+cost_of_living_df_monthly_tidy <- cost_of_living_df_monthly_tidy %>%
+  filter(Category != "Salary") %>%
+  group_by(City) %>%
+  mutate(Total_Expenses = sum(Monthly_Expenses)) %>%
+  ungroup() %>%
+  arrange(desc(Total_Expenses)) %>%
+  mutate(City = factor(City, levels = unique(City)))
+
+# Calculate the total expenses per city for labeling
+total_monthly_expenses <- cost_of_living_df_monthly_tidy %>%
+  group_by(City) %>%
+  summarise(Total_Expenses = sum(Monthly_Expenses))
+
+# Plot bar charts with categories stacked on one another for each city
+plot2_living_expenses <- ggplot(cost_of_living_df_monthly_tidy, aes(x = City, y = Monthly_Expenses)) +
+  geom_bar(aes(fill = Category), stat = "identity", position = "stack") +
+  geom_text(
+    data = total_monthly_expenses, 
+    aes(x = City, y = Total_Expenses, label = Total_Expenses), # Position text at the end of the bars
+    hjust = 0, # Align text to the start of the text element (left after coord_flip)
+    color = "#0c530c", 
+    size = 10,
+    nudge_y = 0  # No vertical nudge required
+  ) +
+  scale_fill_brewer(palette = "Greens") +
+  scale_y_continuous(limits = c(0, 7000)) + # Extend y-axis with a small margin
+  labs(title = "Total Monthly Living Expenses by City",
+       x = "",
+       y = "Monthly Expenses (in US Dollars)",
+       fill = "Category") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 36),
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
+    axis.text.x = element_text(angle = 0, size = 30, vjust = 0.5),
+    axis.text.y = element_text(size = 30),
+    legend.title = element_text(size = 24),
+    legend.text = element_text(size = 24),
+    legend.position = c(0.95, 0.95), # Position inside the plot area
+    legend.justification = c("right", "top"), # Anchor point for legend position
+    legend.box.just = "right", # Justify the legend box inside the plotting area
+    legend.key.size = unit(3, 'lines'),
+    legend.margin = margin(t = 0, r = 10, b = 0, l = 5) # Adjust margins around the legend
+  ) +
+  coord_flip()
+
+# Display the plot
+print(plot2_living_expenses)
+
+# Save the plot with the specified dimensions
+ggsave("plot2_living_expenses.png", plot = plot2_living_expenses, width = 20, height = 20)
+
+```
+
+
+
+
+## Price Fluctuations: Inflation
+
+After discovering expected income and living expenses, we want to now explore the stability of the given prices. To do so, we will look at historical inflation.
+
+
+### Load IMF Inflation Data
+
+```{r, loaddata_inflation}
+
+# Source: https://data.imf.org/?sk=388DFA60-1D26-4ADE-B505-A05A558D9A42&sId=1479329132316
+
+# Load IMF data from locally stored extraction
+annual_inflation <- read_excel("C:/Users/jeanz/Documents/Data Visualization/Inflation-data.xlsx", sheet = "hcpi_a")
+
+# Tidy up the data
+annual_inflation_tidy <- annual_inflation %>%
+  pivot_longer(
+    cols = `1970`:`2022`,
+    names_to = "Year", 
+    values_to = "Inflation_Rate"
+  ) %>%
+  rename(CountryCode = 'Country Code') %>% 
+  select(CountryCode, Country, Year, Inflation_Rate)  # Keep only relevant columns
+
+# View the transformed data
+glimpse(annual_inflation_tidy)
+
+library(purrr) # for the map function
+
+# Define a mapping from country codes to cities
+country_code_to_city <- list(
+  USA = c("New York", "San Francisco"),
+  GBR = "London",
+  DEU = "Berlin",
+  FRA = "Paris",
+  DNK = "Copenhagen",
+  ARE = "Dubai",
+  SGP = "Singapore",
+  CHN = c("Shanghai"),
+  JPN = "Tokyo",
+  IND = "Mumbai",
+  AUS = "Sydney"
+)
+
+# Apply the mapping to the inflation data
+annual_inflation_filtered <- annual_inflation_tidy %>%
+  filter(Year >= "2012", Year <= "2022") %>%
+  rowwise() %>%
+  mutate(City = list(country_code_to_city[[CountryCode]])) %>%
+  unnest(City) %>% 
+  select(Year, City, Country, Inflation_Rate) %>% 
+  mutate(Year = as.numeric(Year))
+
+# Print the result
+print(annual_inflation_filtered)
+
+```
+
+
+### Plot Inflation Visualization
+
+```{r, plot_inflation}
+
+# First, calculate the average inflation rate for each country over the period
+avg_inflation_by_country <- annual_inflation_filtered %>%
+  group_by(Country) %>%
+  summarise(Avg_Inflation = mean(Inflation_Rate, na.rm = TRUE))
+
+# Identify the countries with the min and max average inflation rates
+min_inflation_country <- avg_inflation_by_country %>%
+  filter(Avg_Inflation == min(Avg_Inflation)) %>%
+  pull(Country)
+
+max_inflation_country <- avg_inflation_by_country %>%
+  filter(Avg_Inflation == max(Avg_Inflation)) %>%
+  pull(Country)
+
+# Categorize the data
+filtered_data <- annual_inflation_filtered %>%
+  mutate(Category = case_when(
+    Country == min_inflation_country ~ "Min: Japan",
+    Country == max_inflation_country ~ "Max: India",
+    TRUE ~ "Other Countries"
+  ))
+
+# Prepare data for the ribbon (min and max for Other Countries)
+ribbon_data <- filtered_data %>%
+  filter(Category == "Other Countries") %>%
+  group_by(Year) %>%
+  summarise(ymin = min(Inflation_Rate, na.rm = TRUE),
+            ymax = max(Inflation_Rate, na.rm = TRUE))
+
+# Create the plot
+plot3_inflation <- ggplot(filtered_data, aes(x = Year, y = Inflation_Rate, group = Category, color = Category)) +
+  geom_ribbon(data = ribbon_data, 
+              aes(ymin = ymin, ymax = ymax, x = Year, group = NULL), 
+              fill = "#D7E8CD", alpha = 0.6, inherit.aes = FALSE) +  # Draw ribbon first
+  geom_line(data = filter(filtered_data, Category != "Other Countries"), size = 2) +  # Draw lines on top of ribbon
+  scale_color_manual(values = c("Min: Japan" = "#35CF37", 
+                                "Max: India" = "#0c530c", 
+                                "Other Countries" = "#D7E8CD")) +
+  labs(title = "Inflation Rate Extremes and Range Over the Past Decade",
+       x = "Year",
+       y = "Inflation Rate (%)",
+       color = "Category") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 36),
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
+    axis.text.x = element_text(angle = 0, size = 30, vjust = 0.5),
+    axis.text.y = element_text(size = 30),
+    legend.position = "right",
+    legend.title = element_text(size = 24),
+    legend.text = element_text(size = 24),
+    legend.key.size = unit(1, 'lines'),
+    legend.margin = margin(t = 0, r = 10, b = 0, l = 10)
+  ) +
+  scale_x_continuous(breaks = seq(min(filtered_data$Year), max(filtered_data$Year), by = 1)) +
+  scale_y_continuous(breaks = seq(from = 2 * floor(min(filtered_data$Inflation_Rate) / 2), 
+                                  to = 2 * ceiling(max(filtered_data$Inflation_Rate) / 2), 
+                                  by = 2))  # Ensure breaks at even numbers +
+  coord_flip()
+
+# Display the plot
+print(plot3_inflation)
+
+# Save the inflation plot with the specified dimensions to match the salary plot
+ggsave("plot3_inflation.png", plot = plot3_inflation, width = 20, height = 10)
+
+# Colors
+# 32620e
+# 9dcd5a
+# 35CF37
+# 
+# 00FF03
+# 0c530c
+# b6da9f
+# D7E8CD
+
+
+
+```
+
+
+## Ranking
+
+```{r, cost}
+
+# Calculate the difference and add a rank based on the Average Annual Net Salary
+ranked_salary_df <- selected_combined_df %>%
+  arrange(desc(`Average Annual Net Salary`)) %>%
+  mutate(Rank = row_number()) %>%
+  select(Rank, City, `Average Annual Net Salary`)
+
+# View the ranked data frame
+print(ranked_salary_df)
+
+```
+
+```{r, income}
+
+# Rank the cities by the highest difference
+ranked_cost_df <- difference_df %>%
+  arrange(desc(Difference)) %>%
+  mutate(Rank = row_number()) %>% 
+  select(Rank, City, `Average Annual Net Salary`, Difference)
+
+# View the final ranked data frame
+print(ranked_cost_df)
+
+```
+
+```{r, inflation}
+
+# List of cities for which we want to find the corresponding country and inflation rank
+cities <- c("Singapore", "Shanghai", "Tokyo", "Mumbai", "Sydney", "New York",
+            "San Francisco", "Berlin", "Paris", "Copenhagen", "London", "Dubai")
+
+# Country to city mapping based on the provided list
+city_to_country <- c(Singapore = "Singapore", Shanghai = "China", Tokyo = "Japan",
+                     Mumbai = "India", Sydney = "Australia", 'New York' = "United States",
+                     "San Francisco" = "United States", Berlin = "Germany", Paris = "France",
+                     Copenhagen = "Denmark", London = "United Kingdom", Dubai = "United Arab Emirates")
+
+# Create a data frame from the city to country mapping
+city_country_df <- data.frame(City = names(city_to_country), Country = city_to_country)
+
+# Arrange the cities by the average inflation rate in ascending order
+ranked_inflation_country <- avg_inflation_by_country %>%
+  arrange(Avg_Inflation) %>%
+  mutate(Rank = row_number()) %>%  # Rank the cities from lowest to highest inflation
+  select(Rank, Country, Avg_Inflation)
+
+# Join the city_country_df with the inflation_rank to get the rank and average inflation for each city
+city_inflation_df <- merge(city_country_df, ranked_inflation_country, by = "Country")
+
+# Select and order the columns as needed
+city_inflation_df <- city_inflation_df[, c("Rank", "City", "Country", "Avg_Inflation")]
+
+# Arrange the data frame based on the Rank
+city_inflation_df <- city_inflation_df[order(city_inflation_df$Rank),]
+
+# View the ranked data frame
+print(city_inflation_df)
+
+
+```
+
+```{r}
+
+# Now flip ranking order to descending order (10 to 1 instead of 1 t 10)
+
+
+
+
+# Join the data frames on the 'City' column
+combined_df <- full_join(ranked_salary_df, ranked_cost_df, by = "City") %>%
+  full_join(city_inflation_df, by = "City")
+
+# Rename the rank columns for clarity
+combined_df <- combined_df %>%
+  rename(
+    Salary_Rank = Rank.x,  # Replace with the actual column name from 'ranked_salary_df'
+    Cost_Rank = Rank.y,    # Replace with the actual column name from 'ranked_cost_df'
+    Inflation_Rank = Rank  # Replace with the actual column name from 'city_inflation_df'
+  )
+
+# Calculate the combined rank as the average of the individual ranks
+combined_df <- combined_df %>%
+  rowwise() %>%
+  mutate(
+    Average_Rank = mean(c(Salary_Rank, Cost_Rank, Inflation_Rank), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Rank the cities based on the average rank in ascending order
+combined_df <- combined_df %>%
+  arrange(Average_Rank) %>%
+  mutate(Combined_Rank = row_number())
+
+# Select and reorder columns as needed
+final_combined_df <- combined_df %>%
+  select(Combined_Rank, City, Salary_Rank, Cost_Rank, Inflation_Rank, Average_Rank)
+
+# View the final combined and ranked data frame
+print(final_combined_df)
+
+```
+
+
+
+```{r}
+
+# Join the data frames on the 'City' column
+combined_df <- full_join(ranked_cost_df, city_inflation_df, by = "City")
+
+# Rename the rank columns for clarity
+combined_df <- combined_df %>%
+  rename(
+    Cost_Rank = Rank.x,    # Replace with the actual column name from 'ranked_cost_df'
+    Inflation_Rank = Rank.y  # Replace with the actual column name from 'city_inflation_df'
+  )
+
+# Calculate the weighted average of the ranks
+combined_df <- combined_df %>%
+  rowwise() %>%
+  mutate(
+    Weighted_Average_Rank = (Cost_Rank * 1 + Inflation_Rank * 0.5) / 2.5
+  ) %>%
+  ungroup()
+
+# Rank the cities based on the weighted average rank in descending order
+combined_df <- combined_df %>%
+  arrange(desc(Weighted_Average_Rank)) %>%
+  mutate(Combined_Rank = row_number())
+
+# Select and reorder columns as needed
+final_combined_df <- combined_df %>%
+  select(Combined_Rank, City, Cost_Rank, Inflation_Rank, Weighted_Average_Rank)
+
+# View the final combined and ranked data frame
+print(final_combined_df)
+
+
+```
+
+
+```{r}
+
+# View the final combined and ranked data frame
+print(ranked_salary_df)
+```
+
+

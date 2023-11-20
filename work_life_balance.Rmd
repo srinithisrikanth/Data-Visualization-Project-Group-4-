@@ -1,0 +1,203 @@
+---
+title: "datavisualisation_group"
+output: html_document
+date: "2023-11-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r}
+wlb_data <- read_csv(here::here("work_life_balance.csv")) %>% 
+  janitor::clean_names()
+```
+```{r}
+# Assuming your dataframe is named 'data'
+# Replace 'overworked_population' with the actual column name if it's different
+wlb_data$overworked_population <- as.numeric(gsub("%", "", wlb_data$overworked_population))
+
+wlb_data$remote_jobs <- as.numeric(gsub("%", "", wlb_data$remote_jobs))
+wlb_data$multiple_jobholders <- as.numeric(gsub("%", "", wlb_data$multiple_jobholders))
+wlb_data$inflation <- as.numeric(gsub("%", "", wlb_data$inflation))
+wlb_data$vacations_taken_days <- as.numeric(wlb_data$vacations_taken_days)
+wlb_data$x2021 <- as.numeric(wlb_data$x2021)
+
+```
+
+```{r}
+library(dplyr)
+
+new_row1 <- tibble(
+  x2022 = 0, x2021 = 0, city = "Mumbai", country = "India", remote_jobs = 19.2, 
+  overworked_population = 57, minimum_vacations_offered_days = 15, 
+  vacations_taken_days = 15.3, unemployment = 0, multiple_jobholders = 0, 
+  inflation = 0, paid_parental_leave_days = 0, covid_impact = 0, 
+  covid_support = 0, healthcare = 0, access_to_mental_healthcare = 0, 
+  inclusivity_tolerance = 0, affordability = 0, happiness_culture_leisure = 0, 
+  city_safety = 0, outdoor_spaces = 0, air_quality = 0, 
+  wellness_and_fitness = 0, total_score = 0
+)
+
+new_row <- tibble(
+  x2022 = 0, x2021 = 0, city = "Shanghai", country = "China", remote_jobs = 19.2, 
+  overworked_population = 57, minimum_vacations_offered_days = 10, 
+  vacations_taken_days = 5, unemployment = 0, multiple_jobholders = 0, 
+  inflation = 0, paid_parental_leave_days = 0, covid_impact = 0, 
+  covid_support = 0, healthcare = 0, access_to_mental_healthcare = 0, 
+  inclusivity_tolerance = 0, affordability = 0, happiness_culture_leisure = 0, 
+  city_safety = 0, outdoor_spaces = 0, air_quality = 0, 
+  wellness_and_fitness = 0, total_score = 0
+)
+
+# Assuming wlb_data is your dataframe
+write.csv(wlb_data, "wlb_data.csv", row.names = FALSE)
+
+
+wlb_data <- bind_rows(wlb_data, new_row)
+wlb_data <- bind_rows(wlb_data, new_row1)
+
+```
+
+```{r, fig.width=10, fig.height=7}
+library(ggplot2)
+library(dplyr)
+
+# Assuming your dataframe is named 'data'
+selected_cities <- c("New York", "San Francisco", "London", "Berlin", "Paris", "Copenhagen", 
+                     "Dubai", "Singapore", "Shanghai", "Tokyo", "Mumbai", "Sydney", "Shanghai")
+
+data_filtered <- wlb_data %>% 
+  filter(city %in% selected_cities) %>%
+  select(city, minimum_vacations_offered_days, vacations_taken_days) %>% 
+  arrange(vacations_taken_days)
+
+data_long <- gather(data_filtered, key = "metric", value = "value", -city)
+
+ggplot(data_long, aes(x = reorder(city, value), y = value, fill = metric)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  scale_fill_manual(values = c("#cc8b86", "#a63a50"), 
+                                        name = "Vacation Days Metrics",  # Here we set the legend title
+                    labels = c("Minimum Paid Vacation Days Offered", "Average Vacation Days Taken")) +  # Adjust colors as needed based on your metric
+  theme_minimal(base_size = 12) + # theme_minimal() provides a minimalistic theme with a white background
+  coord_flip()+
+  theme(
+    axis.text.x = element_text(),  # Rotate x-axis text and adjust
+    axis.line = element_line(color = "black"),  # Add axis lines for more definition
+    plot.title = element_text(hjust = 0)  # Center the plot title
+  ) +
+  labs(title = "Work-Life Balance Components by City", x = "City", y = "Number of Days")
+
+
+```
+
+```{r}
+happiness_data <- read_csv(here::here("world_happiness/World Happiness Index by Reports 2013-2023 no nulls.csv")) %>% 
+  janitor::clean_names()
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(maps)
+
+# Example dataset
+selected_countries <- c("United States", "United Kingdom", "India", "China", "Germany", "Denmark", "United Arab Emirates", "France", "Japan", "Australia", "Singapore")
+
+# Filter for the selected countries and year 2023
+data_filtered <- happiness_data %>%
+  filter(country %in% selected_countries & year == 2023) 
+
+# Adjust the names in your data to match the map data
+data_filtered$region <- tolower(data_filtered$country)
+data_filtered$region[data_filtered$region == "united states"] <- "usa"
+data_filtered$region[data_filtered$region == "united kingdom"] <- "uk"
+data_filtered$region[data_filtered$region == "united arab emirates"] <- "united arab emirates"
+
+# World map data
+world_map <- map_data("world")
+
+# Adjust the world map data to have a 'region' column that matches your data
+world_map$region <- tolower(world_map$region)
+
+# Merge your data with the world map data
+merged_data <- left_join(world_map, data_filtered, by = "region")
+
+# Aggregate longitude and latitude in merged_data
+aggregated_location_data <- merged_data %>%
+  group_by(region) %>% 
+  summarise(avg_long= mean(long), avg_lat = mean(lat))
+
+# Join the aggregated longitude and latitude data back to data_filtered
+data_filtered_with_location <- left_join(data_filtered, aggregated_location_data, by = "region")
+
+
+
+```
+
+```{r}
+# Create the map with adjusted geom_text_repel
+
+# Add a nudge_y column with specific values for each country
+data_filtered_with_location <- data_filtered_with_location %>%
+  mutate(nudge_y = case_when(
+    country == "Germany" ~ -25,
+    country == "France" ~ -8,
+    country == "Denmark" ~ 10,
+    country == "United Kingdom" ~ 0,
+    country == "United Arab Emirates" ~ -40,
+    country == "Australia" ~ -20,
+    country == "China" ~ -1,
+    country == "India" ~ -1,
+    country == "Japan" ~ -1,
+    # Add more conditions as needed
+    TRUE ~ 0  # Default value for countries not specified above
+  ),
+  nudge_x = case_when(
+    country == "Germany" ~ 0,
+    country == "France" ~ -30,
+    country == "Denmark" ~ 0,
+    country == "United Kingdom" ~ -40,
+    country == "United Arab Emirates" ~ 0,
+    country == "Australia" ~ 0,
+        country == "China" ~ 0,
+country == "Japan" ~ 5,
+country == "India" ~ 0,
+
+    # Add more conditions as needed
+    TRUE ~ 0  # Default value for countries not specified above
+  ))
+
+ggplot() +
+  geom_polygon(data = merged_data, aes(x = long, y = lat, group = group, fill = index), color = "white") +
+  geom_text_repel(
+    data = data_filtered_with_location,
+    aes(x = avg_long, y = avg_lat, label = paste(country, round(index, 2))),
+    size = 2.5,
+    fontface = 'bold',
+    color = "black",
+    box.padding   = 0.35,        # Space around the label
+    point.padding = 0.5,        # Space around the point
+    segment.color = "black",   # Color of the lines
+    segment.size  = 0.5,        # Thickness of the lines
+    nudge_y = data_filtered_with_location$nudge_y,  # Positive for up, negative for down
+    nudge_x       = data_filtered_with_location$nudge_x,  # Positive for up, negative for down         # Horizontal adjustment from the point
+    direction     = 'y',        # Direction of the repulsion (use 'both' for x and y)
+    max.overlaps  = 10          # Maximum allowed overlaps
+  ) +
+  scale_fill_gradient(low = "pink", high = "darkred", na.value = "gray70", name = "Happiness Index") +
+  theme_void() +
+  theme(legend.position = "bottom", plot.caption = element_text(hjust=0)) +
+  labs(title = "World Happiness Index 2023* for our selected countries",
+       subtitle = "Denmark tops the list with an index of 7.59",
+       caption="*Calculated using GDP per capita, social support, healthy life expectancy, freedom, generosity, and corruption"
+       )
+```
+
